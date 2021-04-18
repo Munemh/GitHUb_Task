@@ -22,7 +22,10 @@ const TemplateItem = (props) => {
         <TouchableOpacity style={{
             backgroundColor: 'white', marginTop: 10, marginBottom: 10
         }} onPress={() => { console.log('working',props.item); }}>
-           <Text>{props.item.reponame  ?props.item.reponame :props.item.name }</Text></TouchableOpacity>
+           <Text>Name = {props.item.reponame  ?props.item.reponame :props.item.name }</Text>
+           <Text>Language = {props.item.reponame  ?props.item.language :props.item.language }</Text>
+           <Text>Stars = {props.item.reponame  ?props.item.stars :props.item.stars }</Text>
+           </TouchableOpacity>
     );
 };
 const styles = StyleSheet.create({

@@ -47,8 +47,8 @@ const App = (props) => {
   const [Language, setLanguage] = useState('');
   const [loading, setLoading] = useState(true);
   const [visibleModal, setVisibleModal] = useState(null);
+  const [searchText, setSearchText] = useState('');
   useEffect(() => {
-    console.log(languages);
     getSearch();
   }, []);
 
@@ -102,8 +102,8 @@ const App = (props) => {
             <TouchableOpacity
               key={item}
               onPress={() => {
-                setLanguage(''),
-                  getSearch();
+                setLanguage('');
+                getSearch();
                 setVisibleModal(null);
               }}>
               <View>
@@ -122,7 +122,7 @@ const App = (props) => {
               key={item}
               onPress={() => {
                 setLanguage(item.name);
-                getLanguage();
+                getLanguage(item.name);
                 setVisibleModal(null);
               }}>
               <View>
@@ -143,10 +143,12 @@ const App = (props) => {
       />
     </View>
   );
-  const getLanguage = () => {
+  const getLanguage = (Language) => {
     setLoading(true);
     githubTrends({ language: Language })
-      .then(result => { console.log("language result", result), setTrendingArray(result); setLoading(false) })
+      .then(results => { console.log("language result", results);
+       setTrendingArray(results); 
+       setLoading(false) })
       .catch(error => { console.log("language error", error) });
 
   }
@@ -154,25 +156,30 @@ const App = (props) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-
       <View style={styles.sectionContainer}>
-        <TextInput
-          style={styles.sectionInputText}
-          placeholder="Search"
-          placeholderTextColor="#000"
-          underlineColorAndroid="transparent"
-          onChangeText={(text) => {
-            getSearch(text);
-          }}
-        // autoFocus={true}
-
-        // value={this.state.value}
-        />
+        <View style={{ flexDirection: 'row', height: 30, width: '100%' }}>
+          <TextInput
+            style={styles.sectionInputText}
+            placeholder="Search"
+            placeholderTextColor="#000"
+            underlineColorAndroid="transparent"
+            onChangeText={(text) => {
+              // getSearch(text);
+              setSearchText(text);
+            }}
+          // autoFocus={true}
+          // value={this.state.value}
+          />
+          <TouchableOpacity style={{ width: '20%' }} onPress={getSearch.bind(this, searchText)}>
+            <Text> Search</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.sectionFilter} >
-          <TouchableOpacity ><Text>Stars</Text></TouchableOpacity>
+          <TouchableOpacity>
+            <Text>Stars</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => setVisibleModal(6)}><Text>Language {Language ? ' : ' + Language : " "}</Text></TouchableOpacity>
         </View>
-
         <Modal
           isVisible={visibleModal === 6}
           onBackdropPress={() => setVisibleModal(null)}
@@ -180,27 +187,21 @@ const App = (props) => {
           onBackButtonPress={() => setVisibleModal(null)}>
           {_renderModalLanguageContent()}
         </Modal>
-
-        {
-          loading ? <Loader /> :
-            trendingArray.length > 0 ? 
+        {loading ? <Loader /> :
+          trendingArray.length > 0 ?
             <View style={{ height: '85%' }}>
               <FlatList
-                // keyboardShouldPersistTaps={'handled'}
-
                 data={trendingArray}
                 renderItem={({ item, index }) => <TemplateItem item={item} index={index} props={props} />}
                 keyExtractor={(item, index) => index.toString()}
                 contentContainerStyle={{ maxheight: '85%' }}
                 showsVerticalScrollIndicator={false}
-
-              />  
-              </View> :
-              <View style={{ height: '85%', justifyContent: 'center' }}>
-                <Text style={{ alignSelf: 'center' }}>NoThing Found</Text> </View>
+              />
+            </View> :
+            <View style={{ height: '85%', justifyContent: 'center' }}>
+              <Text style={{ alignSelf: 'center' }}> NoThing Found </Text>
+            </View>
         }
-
-
       </View>
     </SafeAreaView>
   );
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
   sectionInputText: {
     paddingVertical: 0,
     color: '#000',
-    width: '90%',
+    width: '80%',
     marginEnd: 10,
     marginStart: 10,
     textAlign: 'left',
